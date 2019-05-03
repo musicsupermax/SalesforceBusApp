@@ -1,0 +1,54 @@
+<aura:component implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId" controller="LineController">
+    <aura:attribute name="newRecord" type="Object" />
+    <aura:attribute name="simpleRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="busLine" type="Object" />
+    <aura:attribute name="buses" type="Object" />
+    <aura:attribute name="busLineSimpleRecord" type="Object" />
+    <aura:attribute name="busLineError" type="String" />
+    <aura:attribute name="lines" type="List" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="modalWindowStatusEvent" type="c:ButtonStatusUpdate"/>
+    
+    <force:recordData aura:id="recordEditor"
+                      layoutType="FULL"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.newRecord}"
+                      targetFields ="{!v.simpleRecord}"
+                      />
+    <force:recordData aura:id="busLineEditor"
+                      layoutType="FULL"
+                      targetError="{!v.busLineError}"
+                      targetRecord="{!v.busLine}"
+                      targetFields ="{!v.busLineSimpleRecord}"
+                      mode="EDIT" />
+    <div style="height: 640px;">
+        <section aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning:card iconName="action:edit" title="Create Bus" class="slds-size_1-of-1">
+                        <lightning:input class="slds-m-vertical--x-small" label="Bus Name" value="{!v.simpleRecord.Name}" required="true"/>
+                        <lightning:select class="slds-text-color_weak" value="{!v.busLineSimpleRecord.Line__c}" 
+                                          name="select" label="Line" required="true">
+                            <option>None</option>
+                            <aura:iteration items="{!v.lines}" var="line">
+                                <option class="slds-text-color_default" value="{!line.Id}">
+                                    {!line.Name}</option>
+                            </aura:iteration>    
+                        </lightning:select>
+                    </lightning:card>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_neutral" label="Cancel" onclick="{!c.closeWindow}" />
+                    <lightning:button class="slds-button slds-button_brand" label="Save" onclick="{!c.handleSaveRecord}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        {!v.recordError}
+    </aura:if><aura:if isTrue="{!not(empty(v.busLineError))}">
+    {!v.busLineError}
+    </aura:if>
+</aura:component>

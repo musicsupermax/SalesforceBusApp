@@ -1,0 +1,34 @@
+<aura:component implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId" 
+                controller="LineController">
+    <aura:attribute name="isOpen" type="Boolean" />
+    <aura:attribute name="lines" type="List" />
+    <aura:attribute name="busId" type="String" />
+    <aura:attribute name="lineId" type="String" />
+    <aura:attribute name="buses" type="List"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div style="height: 640px;">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" 
+                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:card iconName="action:edit" title="Add Line" class="slds-size_1-of-1 slds-m-vertical--x-small">
+                        <lightning:select class="slds-text-color_weak" value="{!v.lineId}" 
+                                          name="select" label="Line" required="true">
+                            <option>None</option>
+                            <aura:iteration items="{!v.lines}" var="line">
+                                <option class="slds-text-color_default" value="{!line.Id}">
+                                    {!line.Name}</option>
+                            </aura:iteration>    
+                        </lightning:select>
+                    </lightning:card>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_neutral" label="Cancel" onclick="{!c.closeWindow}" />
+                    <lightning:button class="slds-button slds-button_brand" label="Save" onclick="{!c.handleSaveRecord}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</aura:component>

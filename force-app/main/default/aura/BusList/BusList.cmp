@@ -1,0 +1,87 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" controller="BusListController">
+    <aura:attribute name="buses" type="List"/>
+    <aura:attribute name="status" type="String" default="close"/>
+    <aura:attribute name="inUse" type="Integer" />
+    <aura:attribute name="available" type="Integer" />
+    <aura:attribute name="total" type="Integer" />
+    <aura:attribute name="newLine" type="Object" />
+    <aura:attribute name="line" type="Object" />
+    <aura:attribute name="lineError" type="String" />
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="busId" type="String" />
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="modalWindowStatusEvent" event="c:ButtonStatusUpdate" action="{!c.handleEventChanges}" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    <force:recordData aura:id="lineEditor"
+                      layoutType="FULL"
+                      targetError="{!v.lineError}"
+                      targetRecord="{!v.newLine}"
+                      targetFields ="{!v.line}"
+                      />
+    <lightning:card class="slds-size_1-of-1"  iconName="custom:custom98" title="Bus Info">
+        <div class="slds-text-heading_small slds-text-align_center slds-text-color_error">In Use: {!v.inUse}</div>
+        <div class="slds-text-heading_small slds-text-align_center slds-text-color_success">Available: {!v.available}</div>
+        <div class="slds-text-heading_small slds-text-align_center">Total: {!v.total}</div>
+        <div class="slds-text-heading_small slds-text-align_center">
+        <lightning:button class=" slds-m-left_small slds-m-vertical--x-small" label="Create Bus" 
+                          onclick="{!c.changeCreateWindowStatus}" /></div>
+        <aura:if isTrue="{!v.status == 'open'}">
+            <c:BusCreate buses="{!v.buses}" recordId="{!v.recordId}"/>
+        </aura:if>
+        <aura:if isTrue="{!v.isOpen}">
+            <c:AddLineToBus busId="{!v.busId}" isOpen="{!v.isOpen}"/>
+        </aura:if>
+    </lightning:card>
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered 
+                  slds-m-vertical-small slds-table_col-bordered slds-size_1-of-1">
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-text-heading_medium" title="Bus Name">Bus</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-truncate slds-text-heading_medium" 
+                         title="Bus Status">Status</div>
+                </th>
+                <th class="" style="width: 200px;" scope="col">
+                    <div class="slds-truncate slds-truncate slds-text-heading_medium" 
+                         title="Line">Line</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-truncate slds-text-heading_medium" 
+                         title="Bus Status"></div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.buses}" var="bus">
+                <tr class="slds-hint-parent">
+                    <th data-label="Bus Name" scope="row">
+                        <div class="slds-truncate slds-text-heading_small" 
+                             title="Bus Name">{!bus.Name}</div>
+                    </th>
+                    <td data-label="Bus Status" scope="row">
+                        <div class="slds-truncate slds-p-right_none slds-text-heading_small" 
+                             title="Status">{!bus.Status__c}</div>
+                    </td>
+                    <th data-label="Line" scope="row">
+                            <aura:iteration items="{!bus.Bus_Lines__r}" var="line">
+                                <lightning:pill name="{!join(',', line.Line__r.Id, bus.Id)}" label="{!line.Line__r.Name}" onremove="{!c.handleRemove}"/>
+                            </aura:iteration>
+                    </th>
+                    <th data-label="Bus Name" scope="row">
+                        <lightning:buttonMenu aura:id="menu" onselect="{!c.handleSelect}" 
+                                              alternativeText="Show menu">
+                            <lightning:menuItem value="{!join(',', bus.Id, 'Delete')}" label="Delete Bus" />
+                            <lightning:menuItem value="{!join(',', bus.Id, 'Add')}" label="Add Line" />
+                        </lightning:buttonMenu>
+                    </th>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+    <aura:if isTrue="{!not(empty(v.lineError))}">
+        {!v.lineError}
+    </aura:if>
+</aura:component>
